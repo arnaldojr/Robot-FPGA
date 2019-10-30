@@ -20,12 +20,12 @@ use ieee.numeric_std.all;
 ----------------------------
 entity Debounce is
 	generic(
-		delay : integer := 1000000 -- calculo do debounce t(s) = delay/clock 
+		Debounce_time : integer := 10000000 -- calculo do debounce t(s) = delay/clock 
 	);
     port(   
 		CLOCK_IN : in std_logic;
-      BOTAO_IN : in std_logic;
-      BOTAO_OUT : out std_logic
+      BOTAO_IN : in STD_LOGIC_VECTOR(1 downto 0);
+      BOTAO_OUT : out STD_LOGIC_VECTOR(1 downto 0)
 		);
 end Debounce;
 
@@ -40,8 +40,8 @@ architecture rtl of Debounce is
 --------------
 -- signals
 --------------
-SIGNAL counter : INTEGER RANGE 0 TO DELAY:= 0;
-signal flag: std_logic := '0';
+SIGNAL counter : INTEGER RANGE 0 TO Debounce_time:= 0;
+signal flag: STD_LOGIC_VECTOR(1 downto 0) := "00";
 
 ---------------
 -- implementacao
@@ -55,9 +55,9 @@ PROCESS(CLOCK_IN)
 
 BEGIN
 	IF rising_edge(CLOCK_IN) THEN
-		IF (counter < delay) and (BOTAO_IN /= flag)  THEN
+		IF (counter < Debounce_time) and (BOTAO_IN /= flag)  THEN
 			counter <= counter + 1;
-		ELSIF counter = delay THEN
+		ELSIF counter = Debounce_time THEN
 			counter <= 0;
 			flag <= BOTAO_IN;
 		ELSE
