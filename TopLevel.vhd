@@ -41,7 +41,7 @@ architecture rtl of TopLevel is
 -----------------
 component MotorDC is
 	generic(
-		 DELAY : INTEGER := 100000);
+		 DELAY : INTEGER := 10000);
 	port(
 		CLOCK_IN 	: in STD_LOGIC;
 		DIRECAO		: in std_logic;
@@ -52,11 +52,16 @@ component MotorDC is
 end component;
 
 component Bumper is
-	port ( 
-			b:   in  STD_LOGIC_VECTOR(1 downto 0);
-			q:   out STD_LOGIC_VECTOR(1 downto 0)
+	generic(
+		Debounce_time : integer := 10000000 -- calculo do debounce t(s) = Debounce_time/clock 
 	);
+    port(   
+		CLOCK_IN : in std_logic;
+		b:   in  STD_LOGIC_VECTOR(1 downto 0);
+		q:   out STD_LOGIC_VECTOR(1 downto 0)
+		);
 end component;
+
 
 
 --------------
@@ -83,8 +88,12 @@ S1: MotorDC port map (	CLOCK_IN => CLOCK_50,
 								PWM_OUT => GPIO_0(5)
 							);
 
-S2: Bumper port map (	b => KEY,
-								q => LEDR
-							);
 
+S2: Bumper port map (	CLOCK_IN => CLOCK_50,
+								b => KEY,
+								q => LEDR
+							);						
+							
+							
+							
 end rtl;
