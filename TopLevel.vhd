@@ -3,9 +3,9 @@
 -- Rafael . Corsi @ insper . edu . br
 -- Arnaldo A V J @ insper . edu . br 
 --
--- Arquivo exemplo para acionar o moto DC atraves do 
--- drive L298n com placa DE0-CV utilizada no curso de  
--- elementos de sistemas do 3s da eng. da computacao
+-- Arquivo exemplo para acionar o robo FPGA  com a 
+-- placa DE0-CV utilizada no curso de elementos de 
+-- sistemas do 3s da eng. da computacao
 
 ----------------------------
 -- Bibliotecas ieee       --
@@ -23,10 +23,10 @@ entity TopLevel is
 		 DELAY : INTEGER := 100000);
 	port(
 		CLOCK_50 	: in STD_LOGIC;
-		SW				: in std_logic_vector(9 downto 0);
-		KEY			: in std_logic_vector(1 downto 0);
-		LEDR			: out std_logic_vector(1 downto 0);
-		GPIO_0		: out STD_LOGIC_VECTOR(5 downto 0)
+		SW				: in std_logic_vector(3 downto 0); --DIRECAO_IN(1 downto 0); ENABLE_IN(3 downto 2)
+		KEY			: in std_logic_vector(1 downto 0); --BUMPER_IN(1 downto 0)
+		LEDR			: out std_logic_vector(7 downto 0); --BUMPER_OUT(1 downto 0)
+		GPIO_0		: out STD_LOGIC_VECTOR(5 downto 0) -- DIRECAO_OUT(1 downto 0); ENABLE_OUT(5 downto 2)
 		
 		);
 end entity;
@@ -39,28 +39,36 @@ architecture rtl of TopLevel is
 -----------------
 -- Componentes --
 -----------------
-component MotorDC is
+component RoboFPGA is
 	generic(
-		 DELAY : INTEGER := 10000);
+		 DELAY : INTEGER := 100000
+		 );
 	port(
-		CLOCK_IN 	: in STD_LOGIC;
-		DIRECAO		: in std_logic;
-		DUTY			: in std_logic_vector(3 downto 0);
-		DIRECAO_OUT	: out STD_LOGIC_VECTOR(1 downto 0); -- SAIDA GPIO_0(0) - in1
-		PWM_OUT		: out std_logic
-	);
-end component;
-
-component Bumper is
-	generic(
-		Debounce_time : integer := 10000000 -- calculo do debounce t(s) = Debounce_time/clock 
-	);
-    port(   
-		CLOCK_IN : in std_logic;
-		b:   in  STD_LOGIC_VECTOR(1 downto 0);
-		q:   out STD_LOGIC_VECTOR(1 downto 0)
+		CLOCK_IN :in std_logic;
+		DIRECAO_IN	: in std_logic_vector(1 downto 0);
+		DIRECAO_OUT	: out std_logic_vector(3 downto 0);
+		ENABLE_IN	: in std_logic_vector(1 downto 0);
+		ENABLE_OUT	: out std_logic_vector(1 downto 0);
+		BUMPER_IN	: in std_logic_vector(1 downto 0);
+		BUMPER_OUT	: out std_logic_vector(1 downto 0)		
 		);
 end component;
+
+---------------------------------------------------------------------------------------------
+-------------------------- DESCRIÇAO DAS ENTRADAS E SAIDAS----------------------------------- 
+---------------------------------------------------------------------------------------------
+--DIRECAO_IN(1)			: ENTRADA	: MOTOR1; DIRECAO: 0 = TRAZ, 1 = FRENTE 
+--DIRECAO_IN(0)			: ENTRADA 	: MOTOR0; DIRECAO: 0 = TRAZ, 1 = FRENTE 
+--DIRECAO_OUT(3 DOWNTO 2)	: SAIDA 	: MOTOR1; PINO INA E INB DO DRIVE L298
+--DIRECAO_OUT(1 DOWNTO 0)	: SAIDA 	: MOTOR0; PINO INA E INB DO DRIVE L298
+--
+--ENABLE_IN(1)			: ENTRADA 	: MOTOR1; ATIVA SAIDA : 0 = DESATIVADO, 1 = ATIVADO
+--ENABLE_IN(0)			: ENTRADA 	: MOTOR0; ATIVA SAIDA : 0 = DESATIVADO, 1 = ATIVADO
+--ENABLE_OUT(1)			: SAIDA 	: MOTOR1; PWM PINO ENABLE DO DRIVE L298 	
+--ENABLE_OUT(0)			: SAIDA 	: MOTOR0; PWM PINO ENABLE DO DRIVE L298 
+--
+--BUMPER_IN(1)			: ENTRADA 	: BUMPER1; SENSOR FIM DE CURSO
+--BUMPER_IN(0)			: ENTRADA 	: BUMPER0; SENSOR FIM DE CURSO
 
 
 
@@ -74,26 +82,16 @@ end component;
 ---------------
 
 begin
-S0: MotorDC port map (	CLOCK_IN => CLOCK_50, 
-								DIRECAO => SW(4),
-								DUTY(3 DOWNTO 0) => SW(3 DOWNTO 0),
-								DIRECAO_OUT(1 DOWNTO 0) => GPIO_0(1 DOWNTO 0),
-								PWM_OUT => GPIO_0(2)
+S0: RoboFPGA port map (
+							CLOCK_IN => CLOCK_50,
+							DIRECAO_IN => SW(1 downto 0),
+							--DIRECAO_OUT	 => LEDR(7 downto 4), --GPIO_0(5 downto 2)
+							DIRECAO_OUT	 => GPIO_0(5 downto 2),
+							ENABLE_IN	 => SW(3 downto 2),	
+							--ENABLE_OUT	 => LEDR(3 downto 2), --GPIO_0(1 downto 0)
+							ENABLE_OUT	 => GPIO_0(1 downto 0),
+							BUMPER_IN	 => KEY(1 downto 0),
+							BUMPER_OUT  => LEDR(1 downto 0)
 							);
-								
-S1: MotorDC port map (	CLOCK_IN => CLOCK_50, 
-								DIRECAO => SW(9),
-								DUTY(3 DOWNTO 0) => SW(8 DOWNTO 5),
-								DIRECAO_OUT(1 DOWNTO 0) => GPIO_0(4 DOWNTO 3),
-								PWM_OUT => GPIO_0(5)
-							);
-
-
-S2: Bumper port map (	CLOCK_IN => CLOCK_50,
-								b => KEY,
-								q => LEDR
-							);						
-							
-							
-							
+	
 end rtl;
