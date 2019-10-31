@@ -25,7 +25,7 @@ entity MotorDC is
 		CLOCK_IN 	: in STD_LOGIC;
 		DIRECAO		: in std_logic;
 		DUTY			: in std_logic_vector(3 downto 0);
-		DIRECAO_OUT	: out STD_LOGIC_VECTOR(1 downto 0); -- SAIDA GPIO_0(0) - in1
+		DIRECAO_OUT	: out STD_LOGIC_VECTOR(1 downto 0); 
 		PWM_OUT		: out std_logic
 
 	);
@@ -48,6 +48,7 @@ SIGNAL PWM : INTEGER;
 ---------------
 
 begin
+
 
 DIRECAO_OUT(0) <=  DIRECAO;
 DIRECAO_OUT(1) <= NOT DIRECAO;
