@@ -82,7 +82,7 @@ end component;
 ---------------
 
 begin
-S0: RoboFPGA port map (
+ROBO: RoboFPGA port map (
 							CLOCK_IN => CLOCK_50,
 							DIRECAO_IN => SW(1 downto 0),
 							--DIRECAO_OUT	 => LEDR(7 downto 4), --GPIO_0(5 downto 2)
