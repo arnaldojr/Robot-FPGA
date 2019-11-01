@@ -99,14 +99,14 @@ DUTY_OUT1 <=	"0101" WHEN (ENABLE_IN(1) ='1') else
 DUTY_OUT0 <=	"0101" WHEN (ENABLE_IN(0) ='1') else
 					"0000";
 
-S0: MotorDC port map (	CLOCK_IN => CLOCK_IN, 
+MOTOR0: MotorDC port map (	CLOCK_IN => CLOCK_IN, 
 								DIRECAO => DIRECAO_IN(1),
 								DUTY => DUTY_OUT1,
 								DIRECAO_OUT=> DIRECAO_OUT(3 DOWNTO 2),
 								PWM_OUT => ENABLE_OUT(1)
 							);
 								
-S1: MotorDC port map (	CLOCK_IN => CLOCK_IN, 
+MOTOR1: MotorDC port map (	CLOCK_IN => CLOCK_IN, 
 								DIRECAO => DIRECAO_IN(0),
 								DUTY => DUTY_OUT0,
 								DIRECAO_OUT => DIRECAO_OUT(1 DOWNTO 0),
@@ -114,7 +114,7 @@ S1: MotorDC port map (	CLOCK_IN => CLOCK_IN,
 							);
 
 
-S2: Bumper port map (	CLOCK_IN => CLOCK_IN,
+B0: Bumper port map (	CLOCK_IN => CLOCK_IN,
 								b => BUMPER_IN,
 								q => BUMPER_OUT
 							);						
